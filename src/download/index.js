@@ -1,5 +1,5 @@
 const { PassThrough } = require('stream');
-const miniget = require('miniget');
+const { request } = require('undici');
 
 function createStream(options = {}) {
   const stream = new PassThrough({ highWaterMark: options.highWaterMark || 1024 * 512 });
@@ -9,11 +9,24 @@ function createStream(options = {}) {
   return stream;
 }
 
-function pipeAndSetEvents(req, stream, end) {
-  ['abort', 'request', 'response', 'error', 'redirect', 'retry', 'reconnect'].forEach(event => {
-    req.prependListener(event, stream.emit.bind(stream, event));
+async function fetchStream(url, options = {}) {
+  const headers = {};
+
+  if (options.range) {
+    headers['Range'] = `bytes=${options.range.start}-${options.range.end || ''}`;
+  }
+
+  if (options.requestOptions?.headers) {
+    Object.assign(headers, options.requestOptions.headers);
+  }
+
+  const response = await request(url, {
+    method: 'GET',
+    headers,
+    maxRedirections: 5
   });
-  req.pipe(stream, { end });
+
+  return response.body;
 }
 
 function downloadFromInfo(info, format, options = {}) {
@@ -30,54 +43,63 @@ function downloadFromInfo(info, format, options = {}) {
     return stream;
   }
 
-  const downloadOptions = {
-    highWaterMark: options.highWaterMark || 1024 * 512,
-    requestOptions: options.requestOptions || {}
-  };
+  setImmediate(async () => {
+    try {
+      const downloadOptions = {
+        highWaterMark: options.highWaterMark || 1024 * 512,
+        requestOptions: options.requestOptions || {},
+        range: options.range
+      };
 
-  if (options.begin) {
-    downloadOptions.begin = options.begin;
-  }
+      const contentLength = format.contentLength;
+      const shouldBeChunked = contentLength && options.dlChunkSize && (!options.range || !options.range.start);
 
-  const contentLength = format.contentLength;
-  const shouldBeChunked = contentLength && options.dlChunkSize && (!options.range || !options.range.start);
+      if (shouldBeChunked) {
+        let start = options.range?.start || 0;
+        let end = start + options.dlChunkSize;
+        const rangeEnd = options.range?.end;
 
-  if (shouldBeChunked) {
-    let start = options.range?.start || 0;
-    let end = start + options.dlChunkSize;
-    const rangeEnd = options.range?.end;
+        const downloadChunk = async () => {
+          if (rangeEnd && end >= rangeEnd) end = rangeEnd;
+          if (end >= contentLength) end = 0;
 
-    const downloadChunk = () => {
-      if (rangeEnd && end >= rangeEnd) end = rangeEnd;
-      if (end >= contentLength) end = 0;
+          const shouldContinue = end && end !== rangeEnd;
 
-      const shouldContinue = end && end !== rangeEnd;
-      downloadOptions.range = { start, end };
+          const bodyStream = await fetchStream(format.url, {
+            ...downloadOptions,
+            range: { start, end }
+          });
 
-      const req = miniget(format.url, downloadOptions);
-      req.on('data', chunk => {
-        start += chunk.length;
-      });
-      req.on('end', () => {
-        if (stream.destroyed) return;
-        if (shouldContinue) {
-          end = start + options.dlChunkSize;
-          downloadChunk();
-        }
-      });
+          bodyStream.on('data', chunk => {
+            start += chunk.length;
+            stream.write(chunk);
+          });
 
-      pipeAndSetEvents(req, stream, !shouldContinue);
-    };
+          bodyStream.on('end', () => {
+            if (stream.destroyed) return;
+            if (shouldContinue) {
+              end = start + options.dlChunkSize;
+              downloadChunk();
+            } else {
+              stream.end();
+            }
+          });
 
-    downloadChunk();
-  } else {
-    if (options.range) {
-      downloadOptions.range = options.range;
+          bodyStream.on('error', err => stream.emit('error', err));
+        };
+
+        await downloadChunk();
+      } else {
+        const bodyStream = await fetchStream(format.url, downloadOptions);
+
+        bodyStream.on('data', chunk => stream.write(chunk));
+        bodyStream.on('end', () => stream.end());
+        bodyStream.on('error', err => stream.emit('error', err));
+      }
+    } catch (error) {
+      stream.emit('error', error);
     }
-
-    const req = miniget(format.url, downloadOptions);
-    pipeAndSetEvents(req, stream, true);
-  }
+  });
 
   return stream;
 }
