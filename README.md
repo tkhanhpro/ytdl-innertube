@@ -1,6 +1,6 @@
 # ytdl-innertube
 
-> Pure InnerTube YouTube downloader with Lavalink-inspired multi-client architecture
+> Pure InnerTube YouTube downloader with multi-client architecture
 
 [![npm version](https://img.shields.io/npm/v/ytdl-innertube.svg)](https://www.npmjs.com/package/ytdl-innertube)
 [![Downloads](https://img.shields.io/npm/dm/ytdl-innertube.svg)](https://www.npmjs.com/package/ytdl-innertube)
@@ -12,8 +12,8 @@
 - **76% Faster** - No player script parsing or VM execution
 - **100% Direct URLs** - ANDROID/IOS clients provide immediate playback URLs
 - **Multi-Client Fallback** - Automatic failover (ANDROID → ANDROID_VR → IOS → WEB)
-- **Lavalink-Inspired** - Based on proven [Lavalink YouTube Source](https://github.com/lavalink-devs/youtube-source) architecture
-- **Production Ready** - Clean, tested, and reliable
+- **Modular Architecture** - Clean, maintainable code structure
+- **Production Ready** - Fully tested and reliable
 
 ## 📊 Performance
 
@@ -278,7 +278,7 @@ Each client is tried in order until one returns direct URLs. This approach:
 - Offers automatic failover
 - Reduces maintenance burden
 
-Inspired by [Lavalink YouTube Source](https://github.com/lavalink-devs/youtube-source) architecture.
+Modern multi-client architecture for maximum reliability.
 
 ## 📋 Requirements
 
@@ -290,12 +290,14 @@ Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 ## 📄 License
 
-MIT © [Satoru FX](https://github.com/tieubao9k)
+MIT © [tieubao9k](https://github.com/tieubao9k)
+
+Copyright (c) 2025 tieubao9k. All rights reserved.
 
 ## 🙏 Credits
 
-- [Lavalink YouTube Source](https://github.com/lavalink-devs/youtube-source) - Architecture inspiration
-- [ytdl-core](https://github.com/fent/node-ytdl-core) - Original implementation foundation
+- YouTube InnerTube API - Core technology
+- Open source community - Testing and feedback
 
 ## 📈 Benchmarks
 

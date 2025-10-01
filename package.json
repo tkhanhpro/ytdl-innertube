@@ -1,11 +1,10 @@
 {
   "name": "ytdl-innertube",
   "version": "1.0.0",
-  "description": "Pure InnerTube YouTube downloader with Lavalink-inspired multi-client architecture. Zero signature decryption, 100% direct URLs, 76% faster than traditional methods. Production-ready.",
+  "description": "Pure InnerTube YouTube downloader with multi-client architecture. Zero signature decryption, 100% direct URLs, 76% faster than traditional methods. Production-ready.",
   "keywords": [
     "youtube",
     "innertube",
-    "lavalink",
     "android-client",
     "direct-urls",
     "no-signature",
@@ -75,10 +74,11 @@
     "type": "git",
     "url": "https://github.com/tieubao9k/ytdl-innertube.git"
   },
-  "author": "Satoru FX <contact@satorufx.com> (https://github.com/tieubao9k)",
+  "author": "tieubao9k",
   "license": "MIT",
   "homepage": "https://github.com/tieubao9k/ytdl-innertube#readme",
   "bugs": {
     "url": "https://github.com/tieubao9k/ytdl-innertube/issues"
-  }
+  },
+  "copyright": "Copyright (c) 2025 tieubao9k. All rights reserved."
 }
