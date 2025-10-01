@@ -2,9 +2,29 @@ const fs = require('fs');
 const path = require('path');
 
 class CookieManager {
-  constructor() {
+  constructor(input) {
     this.cookies = {};
     this.cookieString = '';
+
+    if (input !== undefined) {
+      this.load(input);
+    }
+  }
+
+  load(input) {
+    if (typeof input === 'string') {
+      return this.loadFromString(input);
+    } else if (Array.isArray(input)) {
+      return this.loadFromArray(input);
+    } else if (typeof input === 'object' && input !== null) {
+      if (input instanceof CookieManager) {
+        this.cookies = { ...input.cookies };
+        this.cookieString = input.cookieString;
+        return this;
+      }
+      return this.loadFromObject(input);
+    }
+    throw new Error('Invalid cookie input type');
   }
 
   loadFromString(cookieString) {

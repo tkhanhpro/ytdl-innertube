@@ -95,9 +95,23 @@ async function requestInnerTube(videoId, clientName, options = {}) {
     };
 
     if (options.cookies) {
-      const cookieString = typeof options.cookies === 'string'
-        ? options.cookies
-        : options.cookies.getCookieString?.() || '';
+      let cookieString = '';
+
+      if (typeof options.cookies === 'string') {
+        cookieString = options.cookies;
+      } else if (Array.isArray(options.cookies)) {
+        const { CookieManager } = require('./cookies');
+        const manager = new CookieManager(options.cookies);
+        cookieString = manager.getCookieString();
+      } else if (typeof options.cookies === 'object' && options.cookies !== null) {
+        if (options.cookies.getCookieString) {
+          cookieString = options.cookies.getCookieString();
+        } else {
+          const { CookieManager } = require('./cookies');
+          const manager = new CookieManager(options.cookies);
+          cookieString = manager.getCookieString();
+        }
+      }
 
       if (cookieString) {
         headers['Cookie'] = cookieString;
