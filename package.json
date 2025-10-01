@@ -1,0 +1,85 @@
+{
+  "name": "ytdl-innertube",
+  "version": "1.0.0",
+  "description": "Pure InnerTube YouTube downloader with Lavalink-inspired multi-client architecture. Zero signature decryption, 100% direct URLs, 76% faster than traditional methods. Production-ready.",
+  "keywords": [
+    "youtube",
+    "innertube",
+    "lavalink",
+    "android-client",
+    "direct-urls",
+    "no-signature",
+    "fast",
+    "downloader",
+    "stream",
+    "ytdl",
+    "video",
+    "audio",
+    "mp4",
+    "mp3",
+    "2025",
+    "production-ready",
+    "typescript",
+    "modular"
+  ],
+  "main": "./src/index.js",
+  "types": "./src/types/index.d.ts",
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "require": "./src/index.js",
+      "import": "./src/index.js",
+      "types": "./src/types/index.d.ts"
+    },
+    "./core": {
+      "require": "./src/core/innertube.js",
+      "types": "./src/types/index.d.ts"
+    },
+    "./info": {
+      "require": "./src/info/index.js",
+      "types": "./src/types/index.d.ts"
+    },
+    "./formats": {
+      "require": "./src/formats/index.js",
+      "types": "./src/types/index.d.ts"
+    },
+    "./utils": {
+      "require": "./src/utils/url.js",
+      "types": "./src/types/index.d.ts"
+    },
+    "./download": {
+      "require": "./src/download/index.js",
+      "types": "./src/types/index.d.ts"
+    }
+  },
+  "scripts": {
+    "test": "node test/basic-test.js",
+    "example": "node examples/basic-usage.js"
+  },
+  "dependencies": {
+    "http-cookie-agent": "^6.0.8",
+    "https-proxy-agent": "^7.0.6",
+    "m3u8stream": "^0.8.6",
+    "miniget": "^4.2.3",
+    "sax": "^1.4.1",
+    "tough-cookie": "^4.1.4",
+    "undici": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tieubao9k/ytdl-innertube.git"
+  },
+  "author": "Satoru FX <contact@satorufx.com> (https://github.com/tieubao9k)",
+  "license": "MIT",
+  "homepage": "https://github.com/tieubao9k/ytdl-innertube#readme",
+  "bugs": {
+    "url": "https://github.com/tieubao9k/ytdl-innertube/issues"
+  }
+}

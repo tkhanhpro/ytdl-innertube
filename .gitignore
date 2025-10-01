@@ -1,0 +1,14 @@
+node_modules/
+*.log
+*.tmp
+.DS_Store
+.env
+coverage/
+.nyc_output/
+dist/
+*.mp4
+*.mp3
+*.m4a
+*.webm
+.vscode/
+.idea/
