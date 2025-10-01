@@ -26,23 +26,86 @@ class CookieManager {
     try {
       const content = fs.readFileSync(jsonPath, 'utf8');
       const data = JSON.parse(content);
-
-      if (Array.isArray(data)) {
-        const cookieString = data
-          .map(cookie => `${cookie.name}=${cookie.value}`)
-          .join('; ');
-        return this.loadFromString(cookieString);
-      } else if (typeof data === 'object') {
-        const cookieString = Object.entries(data)
-          .map(([name, value]) => `${name}=${value}`)
-          .join('; ');
-        return this.loadFromString(cookieString);
-      }
-
-      throw new Error('Invalid JSON format');
+      return this.loadFromObject(data);
     } catch (error) {
       throw new Error(`Failed to load cookies from JSON ${jsonPath}: ${error.message}`);
     }
+  }
+
+  loadFromObject(data) {
+    if (Array.isArray(data)) {
+      return this.loadFromArray(data);
+    } else if (typeof data === 'object' && data !== null) {
+      const cookieString = Object.entries(data)
+        .map(([name, value]) => `${name}=${value}`)
+        .join('; ');
+      return this.loadFromString(cookieString);
+    }
+
+    throw new Error('Invalid object format');
+  }
+
+  loadFromArray(cookieArray) {
+    if (!Array.isArray(cookieArray)) {
+      throw new Error('Expected array of cookies');
+    }
+
+    const cookieString = cookieArray
+      .map(cookie => {
+        if (typeof cookie === 'string') {
+          return cookie;
+        }
+
+        if (typeof cookie === 'object' && cookie !== null) {
+          const name = cookie.name || cookie.Name || cookie.key;
+          const value = cookie.value || cookie.Value || cookie.val;
+
+          if (name && value !== undefined) {
+            return `${name}=${value}`;
+          }
+        }
+
+        return null;
+      })
+      .filter(c => c !== null)
+      .join('; ');
+
+    return this.loadFromString(cookieString);
+  }
+
+  loadFromNetscapeFile(filePath) {
+    try {
+      const content = fs.readFileSync(filePath, 'utf8');
+      return this.parseNetscapeFormat(content);
+    } catch (error) {
+      throw new Error(`Failed to load Netscape cookies from ${filePath}: ${error.message}`);
+    }
+  }
+
+  parseNetscapeFormat(content) {
+    const lines = content.split('\n');
+    const cookies = [];
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      if (!trimmed || trimmed.startsWith('#')) {
+        continue;
+      }
+
+      const parts = trimmed.split('\t');
+
+      if (parts.length >= 7) {
+        const name = parts[5];
+        const value = parts[6];
+        cookies.push({ name, value });
+      } else if (parts.length >= 2) {
+        const [name, value] = parts;
+        cookies.push({ name, value });
+      }
+    }
+
+    return this.loadFromArray(cookies);
   }
 
   parseCookies(cookieString) {

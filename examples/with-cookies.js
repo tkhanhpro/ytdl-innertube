@@ -6,27 +6,49 @@ async function exampleWithCookies() {
   console.log('='.repeat(60));
   console.log('');
 
-  // Method 1: Load from cookie string
-  console.log('📊 Method 1: Cookie String');
   const cookieManager = ytdl.createCookieManager();
+
+  // Method 1: Cookie String
+  console.log('📊 Method 1: Cookie String');
   cookieManager.loadFromString('CONSENT=YES+1; VISITOR_INFO1_LIVE=xyz123');
-  console.log('✅ Cookies loaded from string');
-  console.log(`   Cookies: ${Object.keys(cookieManager.cookies).join(', ')}`);
+  console.log('✅ Loaded from string');
   console.log('');
 
-  // Method 2: Load from file
-  console.log('📊 Method 2: Load from File');
-  console.log('   Create a file "youtube_cookies.txt" with your cookies');
+  // Method 2: Object
+  console.log('📊 Method 2: Object Format');
+  cookieManager.loadFromObject({
+    CONSENT: 'YES+1',
+    VISITOR_INFO1_LIVE: 'xyz123'
+  });
+  console.log('✅ Loaded from object');
+  console.log('');
+
+  // Method 3: Array (State Array)
+  console.log('📊 Method 3: State Array');
+  cookieManager.loadFromArray([
+    { name: 'CONSENT', value: 'YES+1' },
+    { name: 'VISITOR_INFO1_LIVE', value: 'xyz123' }
+  ]);
+  console.log('✅ Loaded from state array');
+  console.log('   Supports: name/value, Name/Value, key/val');
+  console.log('');
+
+  // Method 4: File (String format)
+  console.log('📊 Method 4: Load from File');
+  console.log('   cookieManager.loadFromFile("cookies.txt")');
   console.log('   Format: NAME1=VALUE1; NAME2=VALUE2');
   console.log('');
 
-  // Method 3: Load from JSON
-  console.log('📊 Method 3: Load from JSON');
-  console.log('   Create a file "youtube_cookies.json":');
-  console.log('   {');
-  console.log('     "CONSENT": "YES+1",');
-  console.log('     "VISITOR_INFO1_LIVE": "xyz123"');
-  console.log('   }');
+  // Method 5: JSON File
+  console.log('📊 Method 5: Load from JSON');
+  console.log('   cookieManager.loadFromJSON("cookies.json")');
+  console.log('   Supports: Object or Array format');
+  console.log('');
+
+  // Method 6: Netscape Format
+  console.log('📊 Method 6: Netscape Format (cookies.txt export)');
+  console.log('   cookieManager.loadFromNetscapeFile("cookies.txt")');
+  console.log('   Standard format from browser extensions');
   console.log('');
 
   // Usage example
