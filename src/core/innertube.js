@@ -83,20 +83,32 @@ async function requestInnerTube(videoId, clientName, options = {}) {
   return new Promise((resolve, reject) => {
     const urlObj = new URL(apiUrl);
 
+    const headers = {
+      'Content-Type': 'application/json',
+      'User-Agent': client.userAgent,
+      'Content-Length': Buffer.byteLength(requestBody),
+      'Accept': '*/*',
+      'Accept-Language': 'en-US,en;q=0.9',
+      'Origin': 'https://www.youtube.com',
+      'Referer': `https://www.youtube.com/watch?v=${videoId}`,
+      ...(options.headers || {})
+    };
+
+    if (options.cookies) {
+      const cookieString = typeof options.cookies === 'string'
+        ? options.cookies
+        : options.cookies.getCookieString?.() || '';
+
+      if (cookieString) {
+        headers['Cookie'] = cookieString;
+      }
+    }
+
     const reqOptions = {
       hostname: urlObj.hostname,
       path: urlObj.pathname + urlObj.search,
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': client.userAgent,
-        'Content-Length': Buffer.byteLength(requestBody),
-        'Accept': '*/*',
-        'Accept-Language': 'en-US,en;q=0.9',
-        'Origin': 'https://www.youtube.com',
-        'Referer': `https://www.youtube.com/watch?v=${videoId}`,
-        ...(options.headers || {})
-      }
+      headers
     };
 
     const req = https.request(reqOptions, res => {

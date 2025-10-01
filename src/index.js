@@ -3,6 +3,7 @@ const { chooseFormat, filterFormats } = require('./formats');
 const { validateID, validateURL, getURLVideoID, getVideoID } = require('./utils/url');
 const { downloadFromInfo, createStream } = require('./download');
 const { CLIENTS } = require('./core/innertube');
+const { CookieManager } = require('./core/cookies');
 
 function ytdl(link, options = {}) {
   const stream = createStream(options);
@@ -37,6 +38,8 @@ ytdl.downloadFromInfo = (info, options = {}) => {
   return downloadFromInfo(info, format, options);
 };
 ytdl.INNERTUBE_CLIENTS = CLIENTS;
+ytdl.CookieManager = CookieManager;
+ytdl.createCookieManager = () => new CookieManager();
 ytdl.version = require('../package.json').version;
 
 module.exports = ytdl;
