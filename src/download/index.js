@@ -20,10 +20,30 @@ async function fetchStream(url, options = {}) {
     Object.assign(headers, options.requestOptions.headers);
   }
 
+  // Sử dụng interceptor để xử lý redirect thay vì maxRedirections
   const response = await request(url, {
     method: 'GET',
     headers,
-    maxRedirections: 5
+    interceptors: {
+      redirect: async (request, follow) => {
+        // Giới hạn số lần redirect (tương đương maxRedirections: 5)
+        let redirectCount = 0;
+        const maxRedirects = 5;
+
+        while (redirectCount < maxRedirects) {
+          const redirectResponse = await follow();
+          if (redirectResponse.statusCode >= 300 && redirectResponse.statusCode < 400 && redirectResponse.headers.location) {
+            redirectCount++;
+            // Tiếp tục theo URL redirect mới
+            request.url = new URL(redirectResponse.headers.location, request.url).toString();
+            continue;
+          }
+          return redirectResponse;
+        }
+
+        throw new Error('Maximum number of redirects exceeded');
+      }
+    }
   });
 
   return response.body;
